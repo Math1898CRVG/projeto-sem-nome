@@ -1,4 +1,7 @@
+<<<<<<< HEAD
 const TIPOS_VALIDOS = ['entrada', 'saida']
+=======
+>>>>>>> b75f732302145d50ae5bb56224f3da961b3f1dba
 const LIMITE_INT_UNSIGNED = 4294967295
 
 function criarErro(mensagem) {
@@ -9,15 +12,20 @@ function criarErro(mensagem) {
 }
 
 function verificarObjeto(body) {
+<<<<<<< HEAD
     if (
         body === null ||
         typeof body !== 'object' ||
         Array.isArray(body)
     ) {
+=======
+    if (body === null || typeof body !== 'object' || Array.isArray(body)) {
+>>>>>>> b75f732302145d50ae5bb56224f3da961b3f1dba
         throw criarErro('Dados inválidos')
     }
 }
 
+<<<<<<< HEAD
 function validarProdutoId(produtoId) {
     if (
         typeof produtoId !== 'number' ||
@@ -80,6 +88,10 @@ function validarId(id) {
         typeof id !== 'string' ||
         !/^[1-9]\d*$/.test(id)
     ) {
+=======
+function validarId(id) {
+    if (typeof id !== 'string' || !/^[1-9]\d*$/.test(id)) {
+>>>>>>> b75f732302145d50ae5bb56224f3da961b3f1dba
         throw criarErro('ID inválido')
     }
 
@@ -92,7 +104,40 @@ function validarId(id) {
     return numero
 }
 
+<<<<<<< HEAD
 module.exports = {
     validarCriacao,
     validarId
 }
+=======
+function validarCriacao(body) {
+    verificarObjeto(body)
+
+    if (!Number.isSafeInteger(body.produto_id) || body.produto_id <= 0) {
+        throw criarErro('Produto inválido')
+    }
+
+    if (body.tipo !== 'entrada' && body.tipo !== 'saida') {
+        throw criarErro('Tipo de movimentação inválido')
+    }
+
+    if (
+        !Number.isInteger(body.quantidade) ||
+        body.quantidade < 1 ||
+        body.quantidade > LIMITE_INT_UNSIGNED
+    ) {
+        throw criarErro('A quantidade deve ser um inteiro positivo válido')
+    }
+
+    return {
+        produto_id: body.produto_id,
+        tipo: body.tipo,
+        quantidade: body.quantidade
+    }
+}
+
+module.exports = {
+    validarCriacao,
+    validarId
+}
+>>>>>>> b75f732302145d50ae5bb56224f3da961b3f1dba
