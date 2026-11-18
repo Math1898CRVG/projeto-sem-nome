@@ -173,6 +173,97 @@ async function editarUsuario(req, res, next) {
     }
 }
 
+async function alterarSenha(req, res, next) {
+    try {
+        const id = req.params.id
+
+        if (!verificarId(id)) {
+            return res.status(400).json({
+                erro: 'O id precisa ser um número inteiro positivo'
+            })
+        }
+
+        const body = req.body ?? {}
+
+        const senhaAtual = typeof body.senhaAtual === 'string'
+            ? body.senhaAtual
+            : ''
+
+        const novaSenha = typeof body.novaSenha === 'string'
+            ? body.novaSenha
+            : ''
+
+        const confirmarSenha = typeof body.confirmarSenha === 'string'
+            ? body.confirmarSenha
+            : ''
+
+        if (!senhaAtual || !novaSenha || !confirmarSenha) {
+            return res.status(400).json({
+                erro: 'Todos os campos são necessários!'
+            })
+        }
+
+        if (novaSenha.length < 8) {
+            return res.status(400).json({
+                erro: 'A nova senha deve ter no mínimo 8 caracteres!'
+            })
+        }
+
+        if (Buffer.byteLength(novaSenha, 'utf8') > 72) {
+            return res.status(400).json({
+                erro: 'A nova senha excede o limite permitido!'
+            })
+        }
+
+        if (novaSenha !== confirmarSenha) {
+            return res.status(400).json({
+                erro: 'A confirmação da senha não corresponde!'
+            })
+        }
+
+        if (senhaAtual === novaSenha) {
+            return res.status(400).json({
+                erro: 'A nova senha precisa ser diferente da atual!'
+            })
+        }
+
+        const [usuarios] = await pool.execute(
+            'SELECT senha FROM usuarios WHERE id = ?',
+            [id]
+        )
+
+        if (usuarios.length === 0) {
+            return res.status(404).json({
+                erro: 'Usuário não encontrado!'
+            })
+        }
+
+        const senhaCorreta = await bcrypt.compare(
+            senhaAtual,
+            usuarios[0].senha
+        )
+
+        if (!senhaCorreta) {
+            return res.status(401).json({
+                erro: 'Senha atual incorreta!'
+            })
+        }
+
+        const hash = await bcrypt.hash(novaSenha, 10)
+
+        await pool.execute(
+            'UPDATE usuarios SET senha = ? WHERE id = ?',
+            [hash, id]
+        )
+
+        return res.status(200).json({
+            mensagem: 'Senha alterada com sucesso!'
+        })
+    } catch (e) {
+        next(e)
+    }
+}
+
 async function excluirUsuario(req, res, next) {
     try {
         const id = req.params.id
@@ -206,5 +297,6 @@ module.exports = {
     mostrarUsuarios,
     criarUsuario,
     editarUsuario,
+    alterarSenha,
     excluirUsuario
 }

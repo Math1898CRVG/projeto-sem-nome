@@ -1,9 +1,13 @@
+
 const express = require('express')
-const usuariosController = require('../controller/usuariosController')
 const router = express.Router()
 
-router.post('/', usuariosController.criarUsuário)
-router.put('/:id', usuariosController.editarUsuário)
-router.delete('/:id', usuariosController.excluirUsuário)
+const usersController = require('../controllers/usuariosController')
+
+router.get('/', usersController.mostrar)
+router.post('/', criarUsuario)
+router.put('/:id', editarUsuario)
+router.patch('/:id/senha', alterarSenha)
+router.delete('/:id', excluirUsuario)
 
 module.exports = router
