@@ -1,14 +1,13 @@
-
 const express = require('express')
 const router = express.Router()
 
-const usersController = require('../controller/usuariosController')
+const usersController = require('../controllers/usuariosController')
 const autenticar = require('../middlewares/autenticacao')
 
 // Rota pública
 router.post('/login', usersController.loginUsuario)
 
-// A partir daqui, todas exigem token
+// A partir daqui, todas exigem autenticação
 router.use(autenticar)
 
 router.get('/', usersController.mostrarUsuarios)

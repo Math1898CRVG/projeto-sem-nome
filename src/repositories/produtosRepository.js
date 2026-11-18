@@ -1,4 +1,3 @@
-
 const pool = require('../config/db')
 
 async function buscarTodos(estoqueId, conexao = pool) {
