@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Entrar — Controle de Estoque</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+
+</head>
+
+<body>
+    <main class="auth">
+
+        <section class="auth-marca">
+            <div class="logo"><span class="logo-icone">CE</span> Controle de Estoque</div>
+            <h1>Saiba o que tem, o que saiu e o que está acabando.</h1>
+            <p>Cadastre produtos, registre entradas e saídas e acompanhe tudo em um só painel.</p>
+        </section>
+
+        <section class="auth-form-area">
+            <div class="auth-card">
+                <div>
+                    <h2 style="font-size:1.5rem">Entrar na sua conta</h2>
+                    <p class="muted">Use o e-mail e a senha do cadastro.</p>
+                </div>
+
+
+                <p class="aviso" id="erro-login" hidden>Mensagem de erro retornada pela API de login.</p>
+
+
+                <form action="#" method="post">
+                    <div class="campo">
+                        <label for="email">E-mail</label>
+                        <input type="email" id="email" name="email" placeholder="usuarios.email — ex.: voce@email.com"
+                            required>
+                    </div>
+
+                    <div class="campo">
+                        <label for="senha">Senha</label>
+                        <input type="password" id="senha" name="senha" placeholder="usuarios.senha — digite sua senha"
+                            required>
+                    </div>
+
+                    <button type="submit" class="btn">Entrar</button>
+                </form>
+
+                <p class="auth-rodape">Ainda não tem conta? <a href="cadastro.html">Criar conta</a></p>
+            </div>
+        </section>
+
+    </main>
+</body>
+
+</html>

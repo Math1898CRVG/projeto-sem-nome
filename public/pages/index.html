@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Controle de Estoque — organize produtos, entradas e saídas</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+
+</head>
+
+<body>
+
+
+    <header class="site-topo">
+        <div class="logo"><span class="logo-icone">CE</span> Controle de Estoque</div>
+        <nav>
+            <a href="login.html">Entrar</a>
+            <a href="cadastro.html" class="btn">Criar conta</a>
+        </nav>
+    </header>
+
+    <main>
+
+        <section class="hero">
+            <div class="hero-texto">
+                <h1>Saiba o que tem, o que saiu e o que está acabando.</h1>
+                <p>Cadastre seus estoques e produtos, registre entradas e saídas e receba o aviso quando algo chegar na
+                    quantidade mínima.</p>
+                <div class="hero-botoes">
+                    <a href="cadastro.html" class="btn">Começar agora</a>
+                    <a href="login.html" class="btn btn-sec">Já tenho conta</a>
+                </div>
+            </div>
+
+
+            <div class="hero-previa">
+                <div class="card indicador">
+                    <span class="muted">Produtos cadastrados</span>
+                    <span class="valor" id="home-produtos">0</span>
+                    <div class="dado">COUNT de produtos (ou exemplo fixo)</div>
+                </div>
+                <div class="card indicador baixo">
+                    <span class="muted">Abaixo do mínimo</span>
+                    <span class="valor" id="home-baixo">0</span>
+                    <div class="dado">quantidade_atual &lt;= quantidade_minima</div>
+                </div>
+                <div class="card indicador entrada">
+                    <span class="muted">Entradas</span>
+                    <span class="valor" id="home-entradas">0</span>
+                    <div class="dado">movimentacoes tipo = entrada</div>
+                </div>
+                <div class="card indicador saida">
+                    <span class="muted">Saídas</span>
+                    <span class="valor" id="home-saidas">0</span>
+                    <div class="dado">movimentacoes tipo = saida</div>
+                </div>
+            </div>
+        </section>
+
+
+        <section class="secao">
+            <div class="secao-titulo">
+                <h2 style="font-size:1.5rem">Tudo o que você precisa para controlar o estoque</h2>
+                <p class="muted">Três passos simples, do cadastro ao acompanhamento.</p>
+            </div>
+
+            <div class="recursos">
+                <article class="card">
+                    <h2>Vários estoques</h2>
+                    <p class="muted">Crie um estoque para cada local, como depósito, loja ou cozinha. Cada um tem seus
+                        próprios produtos.</p>
+                </article>
+                <article class="card">
+                    <h2>Entradas e saídas</h2>
+                    <p class="muted">Registre cada movimentação e a quantidade do produto é atualizada, com o histórico
+                        guardado.</p>
+                </article>
+                <article class="card">
+                    <h2>Aviso de estoque baixo</h2>
+                    <p class="muted">Defina a quantidade mínima de cada produto e veja no painel o que precisa de
+                        reposição.</p>
+                </article>
+            </div>
+        </section>
+
+
+        <section class="chamada">
+            <div>
+                <h2 style="font-size:1.3rem">Pronto para organizar seu estoque?</h2>
+                <p class="muted">Criar a conta leva menos de um minuto.</p>
+            </div>
+            <a href="cadastro.html" class="btn">Criar conta</a>
+        </section>
+    </main>
+
+    <footer class="site-rodape">
+        <span>Controle de Estoque</span>
+        <span><a href="login.html">Entrar</a> · <a href="cadastro.html">Criar conta</a></span>
+    </footer>
+
+</body>
+
+</html>

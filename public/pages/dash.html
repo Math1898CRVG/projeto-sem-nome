@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Painel — Controle de Estoque</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+
+</head>
+<body>
+  <div class="app">
+
+
+    <aside class="menu">
+      <div class="logo"><span class="logo-icone">CE</span> Controle de Estoque</div>
+
+      <nav>
+        <a href="#visao-geral" class="ativo">Visão geral</a>
+        <a href="#produtos">Produtos</a>
+        <a href="#movimentacoes">Movimentações</a>
+        <a href="#alertas">Estoque baixo</a>
+        <a href="#estoques">Meus estoques</a>
+        <a href="perfil.html">Meu perfil</a>
+      </nav>
+
+      <div class="menu-usuario">
+
+        <strong id="usuario-nome">usuarios.nome</strong>
+        <span class="muted" id="usuario-email">usuarios.email</span>
+        <a href="login.html">Sair</a>
+      </div>
+    </aside>
+
+
+    <main class="conteudo">
+
+
+      <header class="topo" id="visao-geral">
+        <div>
+          <h1>Visão geral do estoque</h1>
+          <p class="muted">Os números abaixo são do estoque selecionado.</p>
+        </div>
+
+        <div class="topo-acoes">
+          <div class="campo">
+            <label for="estoque-select">Estoque</label>
+
+            <select id="estoque-select" name="estoque_id">
+              <option value="">estoques.nome — lista dos estoques do usuário</option>
+            </select>
+          </div>
+        </div>
+      </header>
+
+
+      <section class="indicadores">
+        <article class="card indicador">
+          <span class="muted">Produtos cadastrados</span>
+
+          <span class="valor" id="kpi-produtos">0</span>
+          <div class="dado">COUNT de produtos no estoque</div>
+        </article>
+
+        <article class="card indicador baixo">
+          <span class="muted">Abaixo do mínimo</span>
+
+          <span class="valor" id="kpi-baixo">0</span>
+          <div class="dado">COUNT onde quantidade_atual &lt;= quantidade_minima</div>
+        </article>
+
+        <article class="card indicador entrada">
+          <span class="muted">Entradas no período</span>
+
+          <span class="valor" id="kpi-entradas">0</span>
+          <div class="dado">SUM de movimentacoes.quantidade (tipo = entrada)</div>
+        </article>
+
+        <article class="card indicador saida">
+          <span class="muted">Saídas no período</span>
+
+          <span class="valor" id="kpi-saidas">0</span>
+          <div class="dado">SUM de movimentacoes.quantidade (tipo = saida)</div>
+        </article>
+      </section>
+
+
+      <section class="painel">
+
+
+        <div class="coluna">
+
+
+          <article class="card" id="estoques">
+            <div class="card-titulo"><h2>Novo estoque</h2></div>
+
+            <form action="#" method="post">
+              <div class="campo">
+                <label for="estoque-nome">Nome do estoque</label>
+                <input type="text" id="estoque-nome" name="nome" maxlength="100" placeholder="estoques.nome — ex.: Depósito central" required>
+              </div>
+              <button type="submit" class="btn">Criar estoque</button>
+            </form>
+          </article>
+
+
+          <article class="card">
+            <div class="card-titulo"><h2>Novo produto</h2></div>
+
+            <form action="#" method="post">
+              <div class="campo">
+                <label for="produto-nome">Nome do produto</label>
+                <input type="text" id="produto-nome" name="nome" maxlength="100" placeholder="produtos.nome" required>
+              </div>
+              <div class="dupla">
+                <div class="campo">
+                  <label for="produto-atual">Quantidade atual</label>
+                  <input type="number" id="produto-atual" name="quantidade_atual" min="0" value="0" placeholder="produtos.quantidade_atual">
+                </div>
+                <div class="campo">
+                  <label for="produto-minima">Quantidade mínima</label>
+                  <input type="number" id="produto-minima" name="quantidade_minima" min="0" value="0" placeholder="produtos.quantidade_minima">
+                </div>
+              </div>
+              <button type="submit" class="btn">Salvar produto</button>
+            </form>
+          </article>
+
+
+          <article class="card">
+            <div class="card-titulo"><h2>Registrar movimentação</h2></div>
+
+            <form action="#" method="post">
+              <div class="campo">
+                <label for="mov-produto">Produto</label>
+                <select id="mov-produto" name="produto_id" required>
+                  <option value="">produtos.nome — lista do estoque selecionado</option>
+                </select>
+              </div>
+              <div class="dupla">
+                <div class="campo">
+                  <label for="mov-tipo">Tipo</label>
+                  <select id="mov-tipo" name="tipo" required>
+                    <option value="entrada">Entrada</option>
+                    <option value="saida">Saída</option>
+                  </select>
+                </div>
+                <div class="campo">
+                  <label for="mov-qtd">Quantidade</label>
+                  <input type="number" id="mov-qtd" name="quantidade" min="1" placeholder="movimentacoes.quantidade" required>
+                </div>
+              </div>
+              <button type="submit" class="btn">Registrar</button>
+            </form>
+          </article>
+        </div>
+
+
+        <div class="coluna">
+
+
+          <article class="card">
+            <div class="card-titulo">
+              <h2>Entradas e saídas por dia</h2>
+              <span class="muted">últimos 7 dias</span>
+            </div>
+
+            <div class="dado grande" id="grafico-movimentacoes">
+              Área do gráfico: soma de movimentacoes.quantidade por dia, separada por tipo (entrada / saída)
+            </div>
+          </article>
+
+
+          <article class="card" id="produtos">
+            <div class="card-titulo">
+              <h2>Produtos do estoque</h2>
+              <span class="muted" id="produtos-total">produtos: total</span>
+            </div>
+            <div class="tabela">
+              <div class="linha cab cols-produtos">
+                <span>Nome</span><span>Atual</span><span>Mínima</span><span>Situação</span><span>Ações</span>
+              </div>
+
+
+              <div class="linha cols-produtos">
+                <span>produtos.nome</span>
+                <span>produtos.quantidade_atual</span>
+                <span>produtos.quantidade_minima</span>
+                <span><span class="selo baixo">OK ou Baixo</span></span>
+                <span><a href="#">Editar</a></span>
+              </div>
+            </div>
+          </article>
+
+
+          <article class="card" id="movimentacoes">
+            <div class="card-titulo">
+              <h2>Últimas movimentações</h2>
+              <span class="muted">mais recentes primeiro</span>
+            </div>
+            <div class="tabela">
+              <div class="linha cab cols-movs">
+                <span>Produto</span><span>Tipo</span><span>Quantidade</span><span>Data e hora</span>
+              </div>
+
+
+              <div class="linha cols-movs">
+                <span>produtos.nome</span>
+                <span><span class="selo entrada">movimentacoes.tipo</span></span>
+                <span>movimentacoes.quantidade</span>
+                <span>movimentacoes.criado_em</span>
+              </div>
+            </div>
+          </article>
+
+
+          <article class="card" id="alertas">
+            <div class="card-titulo">
+              <h2>Precisam de reposição</h2>
+              <span class="selo baixo">quantidade_atual ≤ quantidade_minima</span>
+            </div>
+            <div class="lista">
+
+              <div class="dado">produtos.nome — atual: produtos.quantidade_atual / mínima: produtos.quantidade_minima</div>
+            </div>
+          </article>
+        </div>
+
+      </section>
+    </main>
+  </div>
+</body>
+</html>

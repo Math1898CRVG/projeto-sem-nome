@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Meu perfil — Controle de Estoque</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+
+
+</head>
+
+<body>
+    <div class="app perfil-app">
+        <main class="conteudo">
+            <header class="perfil-cab">
+                <div class="perfil-identidade">
+                    <div class="avatar" id="avatar">N</div>
+                    <div>
+                        <h1 id="perfil-nome">usuarios.nome</h1>
+                        <p class="muted" id="perfil-email">usuarios.email</p>
+                    </div>
+                </div>
+                <a class="btn perfil-voltar" href="dash.html">← Voltar para o Dashboard</a>
+            </header>
+
+            <p class="aviso" id="perfil-aviso" hidden>Mensagem de sucesso ou erro retornada pela API.</p>
+            <section class="perfil-grade">
+                <div class="coluna">
+                    <article class="card">
+                        <div class="card-titulo">
+                            <h2>Dados da conta</h2>
+                        </div>
+
+                        <form action="#" method="post">
+                            <div class="campo">
+                                <label for="nome">Nome</label>
+                                <input type="text" id="nome" name="nome" maxlength="100"
+                                    placeholder="usuarios.nome — valor atual aparece aqui" required>
+                            </div>
+                            <div class="campo">
+                                <label for="email">E-mail</label>
+                                <input type="email" id="email" name="email" maxlength="255"
+                                    placeholder="usuarios.email — valor atual aparece aqui" required>
+                            </div>
+                            <button type="submit" class="btn">Salvar alterações</button>
+                        </form>
+                    </article>
+
+                    <article class="card">
+                        <div class="card-titulo">
+                            <h2>Alterar senha</h2>
+                        </div>
+
+                        <form action="#" method="post">
+                            <div class="campo">
+                                <label for="senha-atual">Senha atual</label>
+                                <input type="password" id="senha-atual" name="senha_atual"
+                                    placeholder="senha usada hoje" required>
+                            </div>
+                            <div class="dupla">
+                                <div class="campo">
+                                    <label for="senha-nova">Nova senha</label>
+                                    <input type="password" id="senha-nova" name="senha_nova" minlength="6"
+                                        placeholder="nova senha" required>
+                                </div>
+                                <div class="campo">
+                                    <label for="senha-confirmar">Confirmar</label>
+                                    <input type="password" id="senha-confirmar" name="confirmar" minlength="6"
+                                        placeholder="repita a nova senha" required>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn">Alterar senha</button>
+                        </form>
+                    </article>
+                </div>
+
+                <div class="coluna">
+                    <article class="card zona-perigo">
+                        <div class="card-titulo">
+                            <h2>Excluir conta</h2>
+                        </div>
+                        <p class="muted">Apaga a conta e também todos os estoques, produtos e movimentações ligados a
+                            ela. Essa ação não pode ser desfeita.</p>
+
+                        <form action="#" method="post">
+                            <button type="submit" class="btn btn-perigo">Excluir minha conta</button>
+                        </form>
+                    </article>
+                </div>
+            </section>
+        </main>
+    </div>
+</body>
+
+</html>
