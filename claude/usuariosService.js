@@ -1,4 +1,4 @@
-const bcrypt = require('bcryptjs')
+const bcrypt = require('bcrypt')
 const usuariosRepository = require('../repositories/usuariosRepository')
 
 const CUSTO_HASH = 12

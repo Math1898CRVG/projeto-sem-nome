@@ -1,87 +1,105 @@
-const pool = require('../config/db')
+const LIMITE_INT_UNSIGNED = 4294967295
 
-async function criar(estoqueId, nome, quantidadeMinima) {
-    const [resultado] = await pool.execute(
-        `INSERT INTO produtos
-        (estoque_id, nome, quantidade_minima)
-        VALUES (?, ?, ?)`,
-        [estoqueId, nome, quantidadeMinima]
-    )
+function criarErro(mensagem) {
+    const erro = new Error(mensagem)
+    erro.status = 400
 
-    return resultado.insertId
+    return erro
 }
 
-async function buscarPorId(id) {
-    const [resultado] = await pool.execute(
-        `SELECT
-            id,
-            estoque_id,
-            nome,
-            quantidade_atual,
-            quantidade_minima,
-            criado_em
-        FROM produtos
-        WHERE id = ?`,
-        [id]
-    )
-
-    return resultado[0] || null
+function verificarObjeto(body) {
+    if (
+        body === null ||
+        typeof body !== 'object' ||
+        Array.isArray(body)
+    ) {
+        throw criarErro('Dados inválidos')
+    }
 }
 
-async function listarPorEstoque(estoqueId) {
-    const [resultado] = await pool.execute(
-        `SELECT
-            id,
-            estoque_id,
-            nome,
-            quantidade_atual,
-            quantidade_minima,
-            criado_em
-        FROM produtos
-        WHERE estoque_id = ?
-        ORDER BY nome ASC`,
-        [estoqueId]
-    )
+function validarNome(nome) {
+    if (typeof nome !== 'string') {
+        throw criarErro('Nome do produto inválido')
+    }
 
-    return resultado
+    nome = nome.trim()
+
+    const tamanho = [...nome].length
+
+    if (tamanho < 2) {
+        throw criarErro(
+            'O nome do produto deve possuir pelo menos 2 caracteres'
+        )
+    }
+
+    if (tamanho > 100) {
+        throw criarErro(
+            'O nome do produto não pode ultrapassar 100 caracteres'
+        )
+    }
+
+    return nome
 }
 
-async function atualizar(id, nome, quantidadeMinima) {
-    const [resultado] = await pool.execute(
-        `UPDATE produtos
-        SET nome = ?, quantidade_minima = ?
-        WHERE id = ?`,
-        [nome, quantidadeMinima, id]
-    )
+function validarQuantidadeMinima(quantidade) {
+    if (
+        typeof quantidade !== 'number' ||
+        !Number.isSafeInteger(quantidade)
+    ) {
+        throw criarErro('Quantidade mínima inválida')
+    }
 
-    return resultado.affectedRows > 0
+    if (quantidade < 0) {
+        throw criarErro('A quantidade mínima não pode ser negativa')
+    }
+
+    if (quantidade > LIMITE_INT_UNSIGNED) {
+        throw criarErro('A quantidade mínima excede o limite permitido')
+    }
+
+    return quantidade
 }
 
-async function atualizarQuantidade(id, quantidade, conexao = pool) {
-    const [resultado] = await conexao.execute(
-        `UPDATE produtos
-        SET quantidade_atual = ?
-        WHERE id = ?`,
-        [quantidade, id]
-    )
+function validarCriacao(body) {
+    verificarObjeto(body)
 
-    return resultado.affectedRows > 0
+    return {
+        nome: validarNome(body.nome),
+        // Opcional na criação: se não vier, começa em 0
+        quantidade_minima: body.quantidade_minima === undefined
+            ? 0
+            : validarQuantidadeMinima(body.quantidade_minima)
+    }
 }
 
-async function excluir(id) {
-    const [resultado] = await pool.execute(
-        'DELETE FROM produtos WHERE id = ?',
-        [id]
-    )
+function validarAtualizacao(body) {
+    verificarObjeto(body)
 
-    return resultado.affectedRows > 0
+    return {
+        nome: validarNome(body.nome),
+        quantidade_minima: validarQuantidadeMinima(body.quantidade_minima)
+    }
+}
+
+function validarId(id) {
+    if (
+        typeof id !== 'string' ||
+        !/^[1-9]\d*$/.test(id)
+    ) {
+        throw criarErro('ID inválido')
+    }
+
+    const numero = Number(id)
+
+    if (!Number.isSafeInteger(numero)) {
+        throw criarErro('ID inválido')
+    }
+
+    return numero
 }
 
 module.exports = {
-    criar,
-    buscarPorId,
-    listarPorEstoque,
-    atualizar,
-    atualizarQuantidade,
-    excluir
+    validarCriacao,
+    validarAtualizacao,
+    validarId
 }

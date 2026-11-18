@@ -1,5 +1,5 @@
 const { Router } = require('express')
-const estoquesController = require('../controllers/estoquesController')
+const estoquesController = require('../controller/estoquesController')
 const autenticacao = require('../middlewares/autenticacao')
 const produtosRoutes = require('./produtosRoutes')
 const movimentacoesRoutes = require('./movimentacoesRoutes')

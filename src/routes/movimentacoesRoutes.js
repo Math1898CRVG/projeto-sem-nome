@@ -1,5 +1,5 @@
 const { Router } = require('express')
-const movimentacoesController = require('../controllers/movimentacoesController')
+const movimentacoesController = require('../controller/movimentacoesController')
 
 // mergeParams para enxergar :estoqueId vindo de estoquesRoutes
 const router = Router({ mergeParams: true })
