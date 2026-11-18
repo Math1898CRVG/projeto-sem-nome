@@ -25,6 +25,19 @@ async function buscarPorId(id, estoqueId, conexao = pool) {
     return rows[0] || null
 }
 
+async function buscarPorIdParaAtualizacao(id, estoqueId, conexao) {
+    const [rows] = await conexao.execute(
+        `SELECT id, estoque_id, nome, quantidade_atual,
+                quantidade_minima, criado_em
+         FROM produtos
+         WHERE id = ? AND estoque_id = ?
+         FOR UPDATE`,
+        [id, estoqueId]
+    )
+
+    return rows[0] || null
+}
+
 async function buscarPorNome(nome, estoqueId, conexao = pool) {
     const [rows] = await conexao.execute(
         `SELECT id, estoque_id, nome, quantidade_atual,
@@ -93,6 +106,7 @@ async function excluir(id, estoqueId, conexao = pool) {
 module.exports = {
     buscarTodos,
     buscarPorId,
+    buscarPorIdParaAtualizacao,
     buscarPorNome,
     criar,
     atualizar,

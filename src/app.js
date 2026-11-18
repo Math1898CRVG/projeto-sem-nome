@@ -1,6 +1,7 @@
 
 const express = require('express')
 const app = express()
+const path = require('path')
 
 const usuariosRoutes = require('./routes/usuariosRoutes')
 const authRoutes = require('./routes/authRoutes')
@@ -16,6 +17,10 @@ app.get('/', (req, res) => {
     return res.status(200).json({
         mensagem: 'API de controle de estoque funcionando!'
     })
+})
+
+app.get('/', (req,res)=>{
+    res.sendFile(path.join(__dirname, '..', 'public', 'index.html'))
 })
 
 // Rotas
