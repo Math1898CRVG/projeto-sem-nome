@@ -1,6 +1,7 @@
 
 const pool = require("../config/db")
 const bcrypt = require("bcrypt")
+const jwt = require("jsonwebtoken")
 
 function verificarDados(body, exigirSenha = true) {
     body = body && typeof body === 'object' && !Array.isArray(body)
@@ -16,7 +17,7 @@ function verificarDados(body, exigirSenha = true) {
         : ''
 
     const senha = typeof body.senha === 'string'
-        ? body.senha.trim()
+        ? body.senha
         : ''
 
     const emailValido = /^[^\s@.]+(?:\.[^\s@.]+)*@[^\s@.]+(?:\.[^\s@.]+)+$/
@@ -41,8 +42,8 @@ function verificarDados(body, exigirSenha = true) {
         return { erro: 'A senha deve ter no mínimo 8 caracteres!' }
     }
 
-    if (senha.length > 72) {
-        return { erro: 'A senha deve ter no máximo 72 caracteres!' }
+    if (exigirSenha && Buffer.byteLength(senha, 'utf8') > 72) {
+        return { erro: 'A senha excede o limite permitido!' }
     }
 
     return { nome, email, senha }
@@ -67,6 +68,85 @@ async function verificarEmail(email, id = null) {
     return rows.length > 0
 }
 
+// LOGIN
+async function loginUsuario(req, res, next) {
+    try {
+        const body = req.body && typeof req.body === 'object' && !Array.isArray(req.body)
+            ? req.body
+            : {}
+
+        const email = typeof body.email === 'string'
+            ? body.email.trim().toLowerCase()
+            : ''
+
+        const senha = typeof body.senha === 'string'
+            ? body.senha
+            : ''
+
+        if (!email || !senha) {
+            return res.status(400).json({
+                erro: 'Email e senha são necessários!'
+            })
+        }
+
+        if (Buffer.byteLength(senha, 'utf8') > 72) {
+            return res.status(401).json({
+                erro: 'Email ou senha incorretos!'
+            })
+        }
+
+        const [usuarios] = await pool.execute(
+            'SELECT id, nome, email, senha FROM usuarios WHERE email = ?',
+            [email]
+        )
+
+        if (usuarios.length === 0) {
+            return res.status(401).json({
+                erro: 'Email ou senha incorretos!'
+            })
+        }
+
+        const usuario = usuarios[0]
+
+        const senhaCorreta = await bcrypt.compare(
+            senha,
+            usuario.senha
+        )
+
+        if (!senhaCorreta) {
+            return res.status(401).json({
+                erro: 'Email ou senha incorretos!'
+            })
+        }
+
+        const segredo = process.env.JWT_SECRET
+
+        if (!segredo) {
+            throw new Error('JWT_SECRET não configurado')
+        }
+
+        const token = jwt.sign(
+            { id: usuario.id },
+            segredo,
+            { expiresIn: process.env.JWT_EXPIRES_IN || '15m' }
+        )
+
+        return res.status(200).json({
+            mensagem: 'Login realizado com sucesso!',
+            token,
+            usuario: {
+                id: usuario.id,
+                nome: usuario.nome,
+                email: usuario.email
+            }
+        })
+
+    } catch (e) {
+        next(e)
+    }
+}
+
+// LISTAR USUÁRIOS
 async function mostrarUsuarios(req, res, next) {
     try {
         const [rows] = await pool.execute(
@@ -74,11 +154,13 @@ async function mostrarUsuarios(req, res, next) {
         )
 
         return res.status(200).json(rows)
+
     } catch (e) {
         next(e)
     }
 }
 
+// CRIAR USUÁRIO
 async function criarUsuario(req, res, next) {
     try {
         const dados = verificarDados(req.body)
@@ -107,11 +189,19 @@ async function criarUsuario(req, res, next) {
         return res.status(201).json({
             mensagem: 'Usuário criado com sucesso!'
         })
+
     } catch (e) {
+        if (e.code === 'ER_DUP_ENTRY') {
+            return res.status(409).json({
+                erro: 'Este email já está cadastrado!'
+            })
+        }
+
         next(e)
     }
 }
 
+// EDITAR USUÁRIO
 async function editarUsuario(req, res, next) {
     try {
         const id = req.params.id
@@ -145,10 +235,7 @@ async function editarUsuario(req, res, next) {
 
         const atual = usuarios[0]
 
-        if (
-            atual.nome === nome &&
-            atual.email === email
-        ) {
+        if (atual.nome === nome && atual.email === email) {
             return res.status(200).json({
                 mensagem: 'Nada precisou ser alterado'
             })
@@ -168,22 +255,26 @@ async function editarUsuario(req, res, next) {
         return res.status(200).json({
             mensagem: 'Usuário editado com sucesso!'
         })
+
     } catch (e) {
+        if (e.code === 'ER_DUP_ENTRY') {
+            return res.status(409).json({
+                erro: 'Este email já está cadastrado!'
+            })
+        }
+
         next(e)
     }
 }
 
+// ALTERAR SENHA DO USUÁRIO AUTENTICADO
 async function alterarSenha(req, res, next) {
     try {
-        const id = req.params.id
+        const id = req.usuario.id
 
-        if (!verificarId(id)) {
-            return res.status(400).json({
-                erro: 'O id precisa ser um número inteiro positivo'
-            })
-        }
-
-        const body = req.body ?? {}
+        const body = req.body && typeof req.body === 'object' && !Array.isArray(req.body)
+            ? req.body
+            : {}
 
         const senhaAtual = typeof body.senhaAtual === 'string'
             ? body.senhaAtual
@@ -209,9 +300,12 @@ async function alterarSenha(req, res, next) {
             })
         }
 
-        if (Buffer.byteLength(novaSenha, 'utf8') > 72) {
+        if (
+            Buffer.byteLength(senhaAtual, 'utf8') > 72 ||
+            Buffer.byteLength(novaSenha, 'utf8') > 72
+        ) {
             return res.status(400).json({
-                erro: 'A nova senha excede o limite permitido!'
+                erro: 'A senha excede o limite permitido!'
             })
         }
 
@@ -259,11 +353,13 @@ async function alterarSenha(req, res, next) {
         return res.status(200).json({
             mensagem: 'Senha alterada com sucesso!'
         })
+
     } catch (e) {
         next(e)
     }
 }
 
+// EXCLUIR USUÁRIO
 async function excluirUsuario(req, res, next) {
     try {
         const id = req.params.id
@@ -288,12 +384,14 @@ async function excluirUsuario(req, res, next) {
         return res.status(200).json({
             mensagem: 'Usuário deletado com sucesso!'
         })
+
     } catch (e) {
         next(e)
     }
 }
 
 module.exports = {
+    loginUsuario,
     mostrarUsuarios,
     criarUsuario,
     editarUsuario,
