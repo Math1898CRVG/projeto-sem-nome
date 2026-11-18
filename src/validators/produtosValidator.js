@@ -1,87 +1,81 @@
-const pool = require('../config/db')
+const LIMITE_INT_UNSIGNED = 4294967295
 
-async function criar(estoqueId, nome, quantidadeMinima) {
-    const [resultado] = await pool.execute(
-        `INSERT INTO produtos
-        (estoque_id, nome, quantidade_minima)
-        VALUES (?, ?, ?)`,
-        [estoqueId, nome, quantidadeMinima]
-    )
+function criarErro(mensagem) {
+    const erro = new Error(mensagem)
+    erro.status = 400
 
-    return resultado.insertId
+    return erro
 }
 
-async function buscarPorId(id) {
-    const [resultado] = await pool.execute(
-        `SELECT
-            id,
-            estoque_id,
-            nome,
-            quantidade_atual,
-            quantidade_minima,
-            criado_em
-        FROM produtos
-        WHERE id = ?`,
-        [id]
-    )
-
-    return resultado[0] || null
+function verificarObjeto(body) {
+    if (body === null || typeof body !== 'object' || Array.isArray(body)) {
+        throw criarErro('Dados inválidos')
+    }
 }
 
-async function listarPorEstoque(estoqueId) {
-    const [resultado] = await pool.execute(
-        `SELECT
-            id,
-            estoque_id,
-            nome,
-            quantidade_atual,
-            quantidade_minima,
-            criado_em
-        FROM produtos
-        WHERE estoque_id = ?
-        ORDER BY nome ASC`,
-        [estoqueId]
-    )
+function validarNome(nome) {
+    if (typeof nome !== 'string') {
+        throw criarErro('Nome do produto inválido')
+    }
 
-    return resultado
+    nome = nome.trim()
+    const tamanho = [...nome].length
+
+    if (tamanho < 2 || tamanho > 100) {
+        throw criarErro('O nome deve possuir entre 2 e 100 caracteres')
+    }
+
+    return nome
 }
 
-async function atualizar(id, nome, quantidadeMinima) {
-    const [resultado] = await pool.execute(
-        `UPDATE produtos
-        SET nome = ?, quantidade_minima = ?
-        WHERE id = ?`,
-        [nome, quantidadeMinima, id]
-    )
+function validarQuantidadeMinima(quantidade) {
+    if (
+        !Number.isInteger(quantidade) ||
+        quantidade < 0 ||
+        quantidade > LIMITE_INT_UNSIGNED
+    ) {
+        throw criarErro('A quantidade mínima deve ser um inteiro não negativo válido')
+    }
 
-    return resultado.affectedRows > 0
+    return quantidade
 }
 
-async function atualizarQuantidade(id, quantidade, conexao = pool) {
-    const [resultado] = await conexao.execute(
-        `UPDATE produtos
-        SET quantidade_atual = ?
-        WHERE id = ?`,
-        [quantidade, id]
-    )
+function validarId(id) {
+    if (typeof id !== 'string' || !/^[1-9]\d*$/.test(id)) {
+        throw criarErro('ID inválido')
+    }
 
-    return resultado.affectedRows > 0
+    const numero = Number(id)
+
+    if (!Number.isSafeInteger(numero)) {
+        throw criarErro('ID inválido')
+    }
+
+    return numero
 }
 
-async function excluir(id) {
-    const [resultado] = await pool.execute(
-        'DELETE FROM produtos WHERE id = ?',
-        [id]
-    )
+function validarCriacao(body) {
+    verificarObjeto(body)
 
-    return resultado.affectedRows > 0
+    return {
+        nome: validarNome(body.nome),
+        quantidade_minima: validarQuantidadeMinima(
+            body.quantidade_minima === undefined ? 0 : body.quantidade_minima
+        )
+    }
+}
+
+function validarAtualizacao(body) {
+    verificarObjeto(body)
+
+    return {
+        nome: validarNome(body.nome),
+        quantidade_minima: validarQuantidadeMinima(body.quantidade_minima)
+    }
 }
 
 module.exports = {
-    criar,
-    buscarPorId,
-    listarPorEstoque,
-    atualizar,
-    atualizarQuantidade,
-    excluir
+    validarCriacao,
+    validarAtualizacao,
+    validarId
 }

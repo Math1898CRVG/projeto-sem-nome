@@ -3,32 +3,30 @@ const express = require('express')
 const app = express()
 const path = require('path')
 
+const diretorioPublico = path.join(__dirname, '..', 'public')
 const usuariosRoutes = require('./routes/usuariosRoutes')
 const authRoutes = require('./routes/authRoutes')
 const estoquesRoutes = require('./routes/estoquesRoutes')
-const produtosRoutes = require('./routes/produtosRoutes')
-const movimentacoesRoutes = require('./routes/movimentacoesRoutes')
 
 const tratamentoErros = require('./middlewares/tratamentoErros')
 
 app.use(express.json())
 
-app.get('/', (req, res) => {
+app.get('/api/health', (req, res) => {
     return res.status(200).json({
         mensagem: 'API de controle de estoque funcionando!'
     })
 })
 
-app.get('/', (req,res)=>{
-    res.sendFile(path.join(__dirname, '..', 'public', 'index.html'))
+app.use(express.static(diretorioPublico))
+app.get('/', (req, res) => {
+    res.redirect('/pages/index.html')
 })
 
 // Rotas
 app.use('/usuarios', usuariosRoutes)
 app.use('/auth', authRoutes)
 app.use('/estoques', estoquesRoutes)
-app.use('/produtos', produtosRoutes)
-app.use('/movimentacoes', movimentacoesRoutes)
 
 // Rota não encontrada
 app.use((req, res, next) => {
